@@ -33,7 +33,9 @@ for resto in id_resto:
     html = urlopen(req).read()
     html_soup = BeautifulSoup(html, 'html.parser')
     noms = html_soup.findAll("script['type']")
+    
 #    for nom in noms:
 #        types = nom["type"]
 #    print(types)
+
     print(nom)
