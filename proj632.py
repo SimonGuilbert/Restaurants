@@ -20,3 +20,4 @@ for row in rows:
     except:
         pass
 print(page)
+
