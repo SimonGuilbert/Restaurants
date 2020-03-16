@@ -84,7 +84,7 @@ def recherche_site_web(resto):
     except :
         return "None"
     
-def recuperation_des_json(url):
+def recuperation_des_donnees(url):
     """
     recuperation des donnee du restaurant en passant par le json que les pages Jaunes proposent
     Parameters
