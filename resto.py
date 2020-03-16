@@ -69,6 +69,27 @@ def recuperation_des_json(id_resto):
             pass
     #print(donne)
     return donne
+
+def recherche_site_web(id_resto):
+    '''
+    Crée la liste des sites web des restaurants dont les identifiants sont donnés en paramètres
+    Si le site n'existe pas ou n'est pas renseigner alors on ajout "NONE" à la liste
+    :param id_resto: la liste des identifiants de chaque restaurant
+    :return: la liste des site web des restaurants correspondant aux identifiants
+    '''
+
+    url = "https://www.pagesjaunes.fr/pros/detail?bloc_id=" + str(resto)
+    req = Request(url, headers={"User-Agent": "Mozilla/74.0"})
+    html = urlopen(req).read()
+    html_soup = BeautifulSoup(html, 'html.parser')
+    div_sites=html_soup.find("div" , class_="lvs-container marg-btm-s") # div contenant l'adresse du site web
+    try:
+        for div in div_sites:
+            site=div.find('span', class_="value") # Recherche de l'adresse du site web
+            return site.text
+    except :
+        pass
+
         
 url = "https://www.pagesjaunes.fr/annuaire/chercherlespros?quoiqui=restaurant&ou=haute-savoie-74"
     
