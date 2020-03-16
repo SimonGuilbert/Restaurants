@@ -57,7 +57,7 @@ def recherche_site_web(resto):
     :return: la liste des site web des restaurants correspondant aux identifiants
     '''
 
-    url = "https://www.pagesjaunes.fr/pros/detail?bloc_id=" + str(resto)
+    url = "https://www.pagesjaunes.fr/pros/detail?bloc_id=" + str(id_resto)
     req = Request(url, headers={"User-Agent": "Mozilla/74.0"})
     html = urlopen(req).read()
     html_soup = BeautifulSoup(html, 'html.parser')
