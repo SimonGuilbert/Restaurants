@@ -16,12 +16,11 @@ import pandas as pd
 # =============================================================================
 # Fonction
 # =============================================================================
-def recherche_identifiant_resto():
+def recherche_identifiant_resto(url):
     '''
     Recherche les identifiants de tous les restaurants d'une page
     :return: la liste des ces identifiants
     '''
-    url="https://www.pagesjaunes.fr/annuaire/chercherlespros?quoiqui=restaurant&ou=haute-savoie-74"
     req=Request(url,headers={"User-Agent":"Mozilla/74.0"})
     html = urlopen(req).read()
     html_soup = BeautifulSoup(html, 'html.parser')
@@ -54,16 +53,7 @@ def recherche_site_web(id_resto):
             list_sites.append("NONE") # Si il n'y a pas de site web, on ajoute "NONE"
     return list_sites
 
-def recuperation_des_json(url):
-    req=Request(url,headers={"User-Agent":"Mozilla/70.0"})
-    html = urlopen(req).read()
-    html_soup = BeautifulSoup(html, 'html.parser')
-    rows = html_soup.findAll("article")
-    id_resto=[]
-    for row in rows:
-        cells =row["id"]
-        id_resto.append(cells[8:]) 
-    print(len(id_resto))
+def recuperation_des_json(id_resto):
     donne={}
     for resto in id_resto:
         url="https://www.pagesjaunes.fr/pros/detail?bloc_id="+str(resto)
@@ -77,24 +67,15 @@ def recuperation_des_json(url):
             donne[recherche['name']]=[recherche["address"]["streetAddress"],recherche["address"]["postalCode"],recherche["address"]["addressLocality"],recherche["telephone"]]
         except:
             pass
-    print(donne)
+    #print(donne)
     return donne
         
-url="https://www.pagesjaunes.fr/annuaire/chercherlespros?quoiqui=restaurant&ou=haute-savoie-74"
-
+url = "https://www.pagesjaunes.fr/annuaire/chercherlespros?quoiqui=restaurant&ou=haute-savoie-74"
+    
 if __name__ == "__main__":
     identifiants=recherche_identifiant_resto()
     liste_sites_web=recherche_site_web(identifiants)
     print(liste_sites_web)
     donne=recuperation_des_json(url)
     print(donne)
-
-    
-    
-    
-    
-    
-    
-    
-    
     
