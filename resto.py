@@ -36,8 +36,7 @@ def recuperation_des_json(url):
         
         try:
             recherche=json.loads(recherche[0].getText())[0]
-            print(recherche)
-            donne[recherche['name']]=[recherche["address"]["streetAdress"],recherche["address"]["postalCode"],recherche["address"]["addressLocality"],recherche["telephone"]]
+            donne[recherche['name']]=[recherche["address"]["streetAddress"],recherche["address"]["postalCode"],recherche["address"]["addressLocality"],recherche["telephone"]]
         except:
             pass
     print(donne)
