@@ -49,7 +49,7 @@ def recuperation_des_json(id_resto):
     #print(donne)
     return donne
 
-def recherche_site_web(id_resto):
+def recherche_site_web(resto):
     '''
     Crée la liste des sites web des restaurants dont les identifiants sont donnés en paramètres
     Si le site n'existe pas ou n'est pas renseigner alors on ajout "NONE" à la liste
@@ -67,7 +67,7 @@ def recherche_site_web(id_resto):
             site=div.find('span', class_="value") # Recherche de l'adresse du site web
             return site.text
     except :
-        return None
+        return "None"
 
         
 url = "https://www.pagesjaunes.fr/annuaire/chercherlespros?quoiqui=restaurant&ou=haute-savoie-74"
