@@ -67,7 +67,7 @@ def recherche_site_web(id_resto):
             site=div.find('span', class_="value") # Recherche de l'adresse du site web
             return site.text
     except :
-        pass
+        return None
 
         
 url = "https://www.pagesjaunes.fr/annuaire/chercherlespros?quoiqui=restaurant&ou=haute-savoie-74"
