@@ -16,6 +16,44 @@ import pandas as pd
 # =============================================================================
 # Fonction
 # =============================================================================
+def recherche_identifiant_resto():
+    '''
+    Recherche les identifiants de tous les restaurants d'une page
+    :return: la liste des ces identifiants
+    '''
+    url="https://www.pagesjaunes.fr/annuaire/chercherlespros?quoiqui=restaurant&ou=haute-savoie-74"
+    req=Request(url,headers={"User-Agent":"Mozilla/74.0"})
+    html = urlopen(req).read()
+    html_soup = BeautifulSoup(html, 'html.parser')
+    rows = html_soup.findAll("article") #Balise contenant toutes les informations sur un resto
+    id_resto=[]
+    for row in rows:
+        cells =row["id"] #Recherche des identifiants
+        id_resto.append(cells[8:])  #Suppression des termes en trop
+    return id_resto
+
+def recherche_site_web(id_resto):
+    '''
+    Crée la liste des sites web des restaurants dont les identifiants sont donnés en paramètres
+    Si le site n'existe pas ou n'est pas renseigner alors on ajout "NONE" à la liste
+    :param id_resto: la liste des identifiants de chaque restaurant
+    :return: la liste des site web des restaurants correspondant aux identifiants
+    '''
+    list_sites=[]
+    for resto in id_resto:
+        url = "https://www.pagesjaunes.fr/pros/detail?bloc_id=" + str(resto)
+        req = Request(url, headers={"User-Agent": "Mozilla/74.0"})
+        html = urlopen(req).read()
+        html_soup = BeautifulSoup(html, 'html.parser')
+        div_sites=html_soup.find("div" , class_="lvs-container marg-btm-s") # div contenant l'adresse du site web
+        try:
+            for div in div_sites:
+                site=div.find('span', class_="value") # Recherche de l'adresse du site web
+                list_sites.append(site.text)
+        except TypeError :
+            list_sites.append("NONE") # Si il n'y a pas de site web, on ajoute "NONE"
+    return list_sites
+
 def recuperation_des_json(url):
     req=Request(url,headers={"User-Agent":"Mozilla/70.0"})
     html = urlopen(req).read()
@@ -45,7 +83,9 @@ def recuperation_des_json(url):
 url="https://www.pagesjaunes.fr/annuaire/chercherlespros?quoiqui=restaurant&ou=haute-savoie-74"
 
 if __name__ == "__main__":
-    
+    identifiants=recherche_identifiant_resto()
+    liste_sites_web=recherche_site_web(identifiants)
+    print(liste_sites_web)
     donne=recuperation_des_json(url)
     print(donne)
 
