@@ -83,6 +83,74 @@ def recherche_site_web(resto):
             return site.text
     except :
         return "None"
+
+def recherche_menu(resto):
+    '''
+    Crée la liste des sites web des restaurants dont les identifiants sont donnés en paramètres
+    Si le site n'existe pas ou n'est pas renseigner alors on ajout "NONE" à la liste
+    :param id_resto: la liste des identifiants de chaque restaurant
+    :return: la liste des site web des restaurants correspondant aux identifiants
+    '''
+
+    url = "https://www.pagesjaunes.fr/pros/detail?bloc_id=" + str(resto)
+    req = Request(url, headers={"User-Agent": "Mozilla/74.0"})
+    html = urlopen(req).read()
+    html_soup = BeautifulSoup(html, 'html.parser')
+    formules=[]
+    try:
+        div_formules = html_soup.findAll("div", class_="formule marg-btm-s row")  # div contenant les formules
+        for div in div_formules:
+            formule = div.find('p', class_="no-margin")# Recherche de l'intitule de la formule
+            prix = div.find('span', class_="tarif-formule")  # Recherche du prix de la formule
+            formules  += [formule.text, prix.text]
+    except:
+        formules += ["None", "None"]
+    return formules
+
+def recherche_suggestion(resto):
+    '''
+    Crée la liste des sites web des restaurants dont les identifiants sont donnés en paramètres
+    Si le site n'existe pas ou n'est pas renseigner alors on ajout "NONE" à la liste
+    :param id_resto: la liste des identifiants de chaque restaurant
+    :return: la liste des site web des restaurants correspondant aux identifiants
+    '''
+
+    url = "https://www.pagesjaunes.fr/pros/detail?bloc_id=" + str(resto)
+    req = Request(url, headers={"User-Agent": "Mozilla/74.0"})
+    html = urlopen(req).read()
+    html_soup = BeautifulSoup(html, 'html.parser')
+    suggestions=[]
+    try:
+        div_suggestions = html_soup.findAll("div", class_="marg-btm-xs row")  # div contenant les formules
+        for div in div_suggestions:
+            suggestion = div.find('span', class_="col-xs-10 description-mets")# Recherche de l'intitule de la formule
+            prix = div.find('span', class_="col-xs-2 tarif-mets")  # Recherche du prix de la formule
+            suggestions+=[suggestion.text, prix.text]
+    except:
+        suggestions+=["None", "None"]
+    return suggestions
+
+def recherche_prestation(resto):
+    '''
+    Crée la liste des sites web des restaurants dont les identifiants sont donnés en paramètres
+    Si le site n'existe pas ou n'est pas renseigner alors on ajout "NONE" à la liste
+    :param id_resto: la liste des identifiants de chaque restaurant
+    :return: la liste des site web des restaurants correspondant aux identifiants
+    '''
+
+    url = "https://www.pagesjaunes.fr/pros/detail?bloc_id=" + str(resto)
+    req = Request(url, headers={"User-Agent": "Mozilla/74.0"})
+    html = urlopen(req).read()
+    html_soup = BeautifulSoup(html, 'html.parser')
+    prestations=[]
+    li_prestations = html_soup.findAll("li", class_="col-sm-6 marg-btm-s")  # li contenant les prestations
+    try:
+        for li in li_prestations:
+            prestation = li.find('span')# Recherche de l'intitule de la prestation
+            prestations+=[prestation]
+    except:
+        prestations+=["None"]
+    return prestations
     
 def recuperation_des_donnees(url):
     """
