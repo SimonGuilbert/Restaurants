@@ -11,6 +11,9 @@ from urllib.request import Request
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
 import json
+from time import sleep
+
+
 # =============================================================================
 # Fonction
 # =============================================================================
@@ -31,9 +34,12 @@ def nombre_de_page(url):
     TYPE: int
         DESCRIPTION: nombre de page possible
     """
-    page=[]
-    while len(page)==0:#attend de reponse
-        req=Request(url, headers={"User-Agent":"Mozilla/70.0"})
+    page = []
+    while len(page) == 0:  # attend de reponse
+        req = Request(url, data=None,
+                      headers={
+                          'User-Agent': 'Mozilla/5.0 (windows net 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'
+                      })
         html = urlopen(req).read()
         html_soup = BeautifulSoup(html, 'html.parser')
         rows = html_soup.findAll("option")
@@ -44,7 +50,8 @@ def nombre_de_page(url):
                 pass
     return len(page)
 
-def visiter_page(url,page):
+
+def visiter_page(url, page):
     """Creer les url pour changer de page
     Parameters
     ----------
@@ -58,112 +65,96 @@ def visiter_page(url,page):
     TYPE
         DESCRIPTION:Lien avec la page
     """
-    return url+"&page="+str(page)
+    return url + "&page=" + str(page)
+
 
 # =============================================================================
 # Traitement d'un restaurant
 # =============================================================================
 
-def recherche_site_web(resto):
-    '''
+def recherche_site_web(html_soup):
+    """
     Crée la liste des sites web des restaurants dont les identifiants sont donnés en paramètres
     Si le site n'existe pas ou n'est pas renseigner alors on ajout "NONE" à la liste
-    :param id_resto: la liste des identifiants de chaque restaurant
+    :type html_soup: beautifulsoup
+    :param html_soup: html du site dans le format de la bibliotheque beautifulsoup
     :return: la liste des site web des restaurants correspondant aux identifiants
-    '''
-
-    url = "https://www.pagesjaunes.fr/pros/detail?bloc_id=" + str(resto)
-    req = Request(url, headers={"User-Agent": "Mozilla/74.0"})
-    html = urlopen(req).read()
-    html_soup = BeautifulSoup(html, 'html.parser')
-    div_sites=html_soup.find("div" , class_="lvs-container marg-btm-s") # div contenant l'adresse du site web
+    """
+    div_sites = html_soup.find("div", class_="lvs-container marg-btm-s")  # div contenant l'adresse du site web
     try:
         for div in div_sites:
-            site=div.find('span', class_="value") # Recherche de l'adresse du site web
+            site = div.find('span', class_="value")  # Recherche de l'adresse du site web
             return site.text
-    except :
+    except:
         return "None"
 
-def recherche_menu(resto):
-    '''
+
+def recherche_menu(html_soup):
+    """
     Crée la liste des menus des restaurants dont les identifiants sont donnés en paramètres
     Si le menu n'est pas renseigner alors on ajout "NONE" à la liste
-    :param id_resto: la liste des identifiants de chaque restaurant
+    :type html_soup: beautifulsoup
+    :param html_soup: html du site dans le format de la bibliotheque beautifulsoup
     :return: la liste des formules avec leurs prix des restaurants correspondant aux identifiants
-    '''
+    """
 
-    url = "https://www.pagesjaunes.fr/pros/detail?bloc_id=" + str(resto)
-    req = Request(url, headers={"User-Agent": "Mozilla/74.0"})
-    html = urlopen(req).read()
-    html_soup = BeautifulSoup(html, 'html.parser')
-    formules=[]
+    formules = []
     try:
         div_formules = html_soup.findAll("div", class_="formule marg-btm-s row")  # div contenant les formules
         for div in div_formules:
-            formule = div.find('p', class_="no-margin")# Recherche de l'intitule de la formule
+            formule = div.find('p', class_="no-margin")  # Recherche de l'intitule de la formule
             prix = div.find('span', class_="tarif-formule")  # Recherche du prix de la formule
-            formules  += [formule.text, prix.text]
+            formules += [formule.text, prix.text]
     except:
         formules += ["None", "None"]
     return formules
 
-def recherche_suggestion(resto):
-    '''
+
+def recherche_suggestion(html_soup):
+    """
     Crée la liste des suggestion des restaurants dont les identifiants sont donnés en paramètres
     Si les suggestions ne sont pas renseigner alors on ajout "NONE" à la liste
-    :param id_resto: la liste des identifiants de chaque restaurant
+    :type html_soup: beautifulsoup
+    :param html_soup: html du site dans le format de la bibliotheque beautifulsoup
     :return: la liste des suggestions avec leurs prix des restaurants correspondant aux identifiants
-    '''
-
-    url = "https://www.pagesjaunes.fr/pros/detail?bloc_id=" + str(resto)
-    req = Request(url, headers={"User-Agent": "Mozilla/74.0"})
-    html = urlopen(req).read()
-    html_soup = BeautifulSoup(html, 'html.parser')
-    suggestions=[]
+    """
+    suggestions = []
     try:
         div_suggestions = html_soup.findAll("div", class_="marg-btm-xs row")  # div contenant les formules
         for div in div_suggestions:
-            suggestion = div.find('span', class_="col-xs-10 description-mets")# Recherche de l'intitule de la formule
+            suggestion = div.find('span', class_="col-xs-10 description-mets")  # Recherche de l'intitule de la formule
             prix = div.find('span', class_="col-xs-2 tarif-mets")  # Recherche du prix de la formule
-            suggestions+=[suggestion.text, prix.text]
+            suggestions += [suggestion.text, prix.text]
     except:
-        suggestions+=["None", "None"]
+        suggestions += ["None", "None"]
     return suggestions
 
-def recherche_prestation(resto):
-    '''
+
+def recherche_prestation(html_soup):
+    """
     Crée la liste des prestations des restaurants dont les identifiants sont donnés en paramètres
     Si les prestation ne sont pas renseigner alors on ajout "NONE" à la liste
-    :param id_resto: la liste des identifiants de chaque restaurant
+    :type html_soup: beautifulsoup
+    :param html_soup: html du site dans le format de la bibliotheque beautifulsoup
     :return: la liste des prestations des restaurants correspondant aux identifiants
-    '''
-
-    url = "https://www.pagesjaunes.fr/pros/detail?bloc_id=" + str(resto)
-    req = Request(url, headers={"User-Agent": "Mozilla/74.0"})
-    html = urlopen(req).read()
-    html_soup = BeautifulSoup(html, 'html.parser')
-    prestations=[]
+    """
+    prestations = []
     li_prestations = html_soup.findAll("li", class_="col-sm-6 marg-btm-s")  # li contenant les prestations
     try:
         for li in li_prestations:
-            prestation = li.find('span')# Recherche de l'intitule de la prestation
-            prestations+=[prestation]
+            prestation = li.find('span')  # Recherche de l'intitule de la prestation
+            prestations += [prestation.text]
     except:
-        prestations+=["None"]
+        prestations += ["None"]
     return prestations
-
-def recherche_horaires(resto):
-    '''
+def recherche_horaires(html_soup,):
+    """
     Crée la liste des horaires des restaurants dont les identifiants sont donnés en paramètres
     Si les horaires ne sont pas renseigner alors on ajout "NONE" à la liste
-    :param id_resto: la liste des identifiants de chaque restaurant
+    :type html_soup: beautifulsoup
+    :param html_soup: html du site dans le format de la bibliotheque beautifulsoup
     :return: la liste des horaires des restaurants correspondant aux identifiants
-    '''
-
-    url = "https://www.pagesjaunes.fr/pros/detail?bloc_id=" + str(resto)
-    req = Request(url, headers={"User-Agent": "Mozilla/74.0"})
-    html = urlopen(req).read()
-    html_soup = BeautifulSoup(html, 'html.parser')
+    """
     horaires=[]
     ul_horaires = html_soup.find("ul", class_="hidden liste-horaires-principaux")  # ul contenant les horaires
     li_horaires = ul_horaires.findAll("li" , class_="horaire-ouvert")
@@ -178,7 +169,25 @@ def recherche_horaires(resto):
     except:
         horaires+=["None"]
     return horaires
-    
+
+def recherche_coord_gps(html_soup):
+    try:
+        div=html_soup.find("div", class_="pj-on-autoload")
+        print(div)
+        url = json.loads(div.get("data-pjajax"))["url"] # Valeur de la clé "url" du dictionnaire data-pjajax
+        print(url)
+        url = url[(len(url)-10):] # On enlève les 10 premiers caractères de gauche
+        url = "https://www.pagesjaunes.fr/carte?"+url
+        print(url)
+        req = Request(url, headers={"User-Agent":"Mozilla/70.0"})
+        html = urlopen(req).read()
+        html_soup = BeautifulSoup(html, 'html.parser')
+        button = html_soup.find("button", class_="button secondaire-1 xs_large calculer") # Recherche de toutes les balise button
+        coord = button.get("data-pjcarto-itineraire")["xyproqualif"]
+        return coord # Retourne les coordonnées de la forme [latitude,longitude]
+    except:
+        return "None"
+
 def recuperation_des_donnees(url):
     """
     recuperation des donnee du restaurant en passant par le json que les pages Jaunes proposent
@@ -193,44 +202,50 @@ def recuperation_des_donnees(url):
         DESCRIPTION: Information retenu pour le CSV
 
     """
-    req=Request(url,headers={"User-Agent":"Mozilla/70.0"})
+    req = Request(url, headers={"User-Agent": "Mozilla/70.0"})
     html = urlopen(req).read()
     html_soup = BeautifulSoup(html, 'html.parser')
     rows = html_soup.findAll("article")
-    id_resto=[]
+    id_resto = []
     for row in rows:
-        cells =row["id"]
-        id_resto.append(cells[8:]) 
-    print("nombre de restaurant sur la page=",len(id_resto))
-    donne={}
+        cells = row["id"]
+        id_resto.append(cells[8:])
+    print("nombre de restaurant sur la page=", len(id_resto))
+    donne = {}
+
     for resto in id_resto:
-        url="https://www.pagesjaunes.fr/pros/detail?bloc_id="+str(resto)#accés au differents lien
-        req=Request(url,headers={"User-Agent":"Mozilla/70.0"})
+        # pour chaque restaurant
+        url = "https://www.pagesjaunes.fr/pros/detail?bloc_id=" + str(resto)  # accés aux differents liens
+        req = Request(url, headers={"User-Agent": "Mozilla/70.0"})
         html = urlopen(req).read()
         html_soup = BeautifulSoup(html, 'html.parser')
-        #recherche site 
-        nom_site=recherche_site_web(resto)
-        #recherche json
-        recherche = html_soup.findAll("script",attrs={'type':"application/ld+json"})   
+        # recherche site
+        nom_site = recherche_site_web(html_soup)
+        # recherche des suggestion
+        suggestion = recherche_suggestion(html_soup)
+        # recherche des prestation
+        prestation = recherche_prestation(html_soup)
+        # recherche menu
+        menu = recherche_menu(html_soup)
+        # recherche horaires
+        horaires = recherche_horaires(html_soup)
+        # recherche json
+        recherche = html_soup.findAll("script", attrs={'type': "application/ld+json"})
+
         try:
-            recherche=json.loads(recherche[0].getText())[0]
-            donne[recherche['name']]=[recherche["address"]["streetAddress"],recherche["address"]["postalCode"],recherche["address"]["addressLocality"],recherche["telephone"],nom_site]
-        except:
+            recherche = json.loads(recherche[0].getText())[0]
+            donne[recherche['name']] = [recherche["address"]["streetAddress"], recherche["address"]["postalCode"],
+                                        recherche["address"]["addressLocality"], recherche["telephone"], nom_site,
+                                        recherche["servesCuisine"],
+                                        recherche["review"][0]["reviewRating"]["ratingValue"], menu, suggestion,
+                                        prestation,horaires]
+
+        except KeyError:
+            # pas de note
+            donne[recherche['name']] = [recherche["address"]["streetAddress"], recherche["address"]["postalCode"],
+                                        recherche["address"]["addressLocality"], recherche["telephone"], nom_site,
+                                        "None", "None", menu, suggestion, prestation,horaires]
+        except IndexError:
+            # pas de json
             pass
     return donne
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
