@@ -151,6 +151,33 @@ def recherche_prestation(resto):
     except:
         prestations+=["None"]
     return prestations
+
+def recherche_horaires(resto):
+    '''
+    Crée la liste des horaires des restaurants dont les identifiants sont donnés en paramètres
+    Si les horaires ne sont pas renseigner alors on ajout "NONE" à la liste
+    :param id_resto: la liste des identifiants de chaque restaurant
+    :return: la liste des horaires des restaurants correspondant aux identifiants
+    '''
+
+    url = "https://www.pagesjaunes.fr/pros/detail?bloc_id=" + str(resto)
+    req = Request(url, headers={"User-Agent": "Mozilla/74.0"})
+    html = urlopen(req).read()
+    html_soup = BeautifulSoup(html, 'html.parser')
+    horaires=[]
+    ul_horaires = html_soup.find("ul", class_="hidden liste-horaires-principaux")  # ul contenant les horaires
+    li_horaires = ul_horaires.findAll("li" , class_="horaire-ouvert")
+    try:
+        for li in li_horaires:
+            jour = li.find('p')# Recherche du jour
+            heures=li.findAll("span", class_="horaire") # Recherche des horaires pour ce jour
+            un_jour=[jour.text]
+            for heure in heures : # Ajout de toutes les heures
+                un_jour+=[heure.text]
+            horaires+=un_jour
+    except:
+        horaires+=["None"]
+    return horaires
     
 def recuperation_des_donnees(url):
     """
