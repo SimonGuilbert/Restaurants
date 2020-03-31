@@ -86,10 +86,10 @@ def recherche_site_web(resto):
 
 def recherche_menu(resto):
     '''
-    Crée la liste des sites web des restaurants dont les identifiants sont donnés en paramètres
-    Si le site n'existe pas ou n'est pas renseigner alors on ajout "NONE" à la liste
+    Crée la liste des menus des restaurants dont les identifiants sont donnés en paramètres
+    Si le menu n'est pas renseigner alors on ajout "NONE" à la liste
     :param id_resto: la liste des identifiants de chaque restaurant
-    :return: la liste des site web des restaurants correspondant aux identifiants
+    :return: la liste des formules avec leurs prix des restaurants correspondant aux identifiants
     '''
 
     url = "https://www.pagesjaunes.fr/pros/detail?bloc_id=" + str(resto)
@@ -109,10 +109,10 @@ def recherche_menu(resto):
 
 def recherche_suggestion(resto):
     '''
-    Crée la liste des sites web des restaurants dont les identifiants sont donnés en paramètres
-    Si le site n'existe pas ou n'est pas renseigner alors on ajout "NONE" à la liste
+    Crée la liste des suggestion des restaurants dont les identifiants sont donnés en paramètres
+    Si les suggestions ne sont pas renseigner alors on ajout "NONE" à la liste
     :param id_resto: la liste des identifiants de chaque restaurant
-    :return: la liste des site web des restaurants correspondant aux identifiants
+    :return: la liste des suggestions avec leurs prix des restaurants correspondant aux identifiants
     '''
 
     url = "https://www.pagesjaunes.fr/pros/detail?bloc_id=" + str(resto)
@@ -132,10 +132,10 @@ def recherche_suggestion(resto):
 
 def recherche_prestation(resto):
     '''
-    Crée la liste des sites web des restaurants dont les identifiants sont donnés en paramètres
-    Si le site n'existe pas ou n'est pas renseigner alors on ajout "NONE" à la liste
+    Crée la liste des prestations des restaurants dont les identifiants sont donnés en paramètres
+    Si les prestation ne sont pas renseigner alors on ajout "NONE" à la liste
     :param id_resto: la liste des identifiants de chaque restaurant
-    :return: la liste des site web des restaurants correspondant aux identifiants
+    :return: la liste des prestations des restaurants correspondant aux identifiants
     '''
 
     url = "https://www.pagesjaunes.fr/pros/detail?bloc_id=" + str(resto)
