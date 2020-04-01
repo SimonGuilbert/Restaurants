@@ -34,21 +34,25 @@ def nombre_de_page(url):
     TYPE: int
         DESCRIPTION: nombre de page possible
     """
-    page = []
-    while len(page) == 0:  # attend de reponse
+    nbre_page = 0
+    while nbre_page == 0:  # attente de reponse
         req = Request(url, data=None,
                       headers={
-                          'User-Agent': 'Mozilla/5.0 (windows net 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'
+                          'User-Agent': "Mozilla/5.0 (windows net 10.0) AppleWebKit/537.36 (KHTML, like Gecko) " +
+                                        "Chrome/35.0.1916.47 Safari/537.36 "
                       })
         html = urlopen(req).read()
         html_soup = BeautifulSoup(html, 'html.parser')
-        rows = html_soup.findAll("option")
-        for row in rows:
-            try:
-                page.append(int(row["value"]))
-            except:
-                pass
-    return len(page)
+        row = html_soup.find("span", class_="pagination-compteur")
+        try:
+
+            nbre_page = int(row.text[9:12])
+        except ValueError:
+            nbre_page = int(row.text[9:11])
+        except:
+            nbre_page = 0
+
+    return nbre_page
 
 
 def visiter_page(url, page):
@@ -147,7 +151,9 @@ def recherche_prestation(html_soup):
     except:
         prestations += ["None"]
     return prestations
-def recherche_horaires(html_soup,):
+
+
+def recherche_horaires(html_soup, ):
     """
     Crée la liste des horaires des restaurants dont les identifiants sont donnés en paramètres
     Si les horaires ne sont pas renseigner alors on ajout "NONE" à la liste
@@ -155,38 +161,64 @@ def recherche_horaires(html_soup,):
     :param html_soup: html du site dans le format de la bibliotheque beautifulsoup
     :return: la liste des horaires des restaurants correspondant aux identifiants
     """
-    horaires=[]
+    horaires = []
     ul_horaires = html_soup.find("ul", class_="hidden liste-horaires-principaux")  # ul contenant les horaires
-    li_horaires = ul_horaires.findAll("li" , class_="horaire-ouvert")
+    li_horaires = ul_horaires.findAll("li", class_="horaire-ouvert")
     try:
         for li in li_horaires:
-            jour = li.find('p')# Recherche du jour
-            heures=li.findAll("span", class_="horaire") # Recherche des horaires pour ce jour
-            un_jour=[jour.text]
-            for heure in heures : # Ajout de toutes les heures
-                un_jour+=[heure.text]
-            horaires+=un_jour
+            jour = li.find('p')  # Recherche du jour
+            heures = li.findAll("span", class_="horaire")  # Recherche des horaires pour ce jour
+            un_jour = [jour.text]
+            for heure in heures:  # Ajout de toutes les heures
+                un_jour += [heure.text]
+            horaires += un_jour
     except:
-        horaires+=["None"]
+        horaires += ["None"]
     return horaires
+
 
 def recherche_coord_gps(html_soup):
     try:
-        div=html_soup.find("div", class_="pj-on-autoload")
+        div = html_soup.find("div", id="bloc-ouverture")
         print(div)
-        url = json.loads(div.get("data-pjajax"))["url"] # Valeur de la clé "url" du dictionnaire data-pjajax
+        url = json.loads(div.get("data-pjajax"))["url"]  # Valeur de la clé "url" du dictionnaire data-pjajax
         print(url)
-        url = url[(len(url)-10):] # On enlève les 10 premiers caractères de gauche
-        url = "https://www.pagesjaunes.fr/carte?"+url
+        url = url[(len(url) - 38):]  # On enlève les 10 premiers caractères de gauche
+        url = "https://www.pagesjaunes.fr/carte?" + url
         print(url)
-        req = Request(url, headers={"User-Agent":"Mozilla/70.0"})
+        req = Request(url, headers={"User-Agent": "Mozilla/70.0"})
         html = urlopen(req).read()
         html_soup = BeautifulSoup(html, 'html.parser')
-        button = html_soup.find("button", class_="button secondaire-1 xs_large calculer") # Recherche de toutes les balise button
+        button = html_soup.find("button",
+                                class_="button secondaire-1 xs_large calculer")  # Recherche de toutes les balise button
         coord = button.get("data-pjcarto-itineraire")["xyproqualif"]
-        return coord # Retourne les coordonnées de la forme [latitude,longitude]
+        return coord  # Retourne les coordonnées de la forme [latitude,longitude]
     except:
         return "None"
+
+
+def recherche_json(html_soup):
+    """"verifier les differents cas
+
+    """
+    recherche = html_soup.findAll("script", attrs={'type': "application/ld+json"})
+    try:
+        recherche = json.loads(recherche[0].getText())[0]
+        return [recherche['name'], recherche["address"]["streetAddress"], recherche["address"]["postalCode"],
+                recherche["address"]["addressLocality"], recherche["telephone"],
+                recherche["servesCuisine"],
+                recherche["review"][0]["reviewRating"]["ratingValue"]]
+
+    except KeyError:
+        # pas de note ni de style cuisinaire
+        return [recherche['name'], recherche["address"]["streetAddress"],
+                recherche["address"]["postalCode"],
+                recherche["address"]["addressLocality"], recherche["telephone"],
+                "None", "None"]
+    except IndexError:
+        # pas de json
+        return "None"
+
 
 def recuperation_des_donnees(url):
     """
@@ -202,6 +234,7 @@ def recuperation_des_donnees(url):
         DESCRIPTION: Information retenu pour le CSV
 
     """
+    sleep(2)
     req = Request(url, headers={"User-Agent": "Mozilla/70.0"})
     html = urlopen(req).read()
     html_soup = BeautifulSoup(html, 'html.parser')
@@ -221,31 +254,21 @@ def recuperation_des_donnees(url):
         html_soup = BeautifulSoup(html, 'html.parser')
         # recherche site
         nom_site = recherche_site_web(html_soup)
-        # recherche des suggestion
+        # recherche des suggestions
         suggestion = recherche_suggestion(html_soup)
-        # recherche des prestation
+        # recherche des prestations
         prestation = recherche_prestation(html_soup)
         # recherche menu
         menu = recherche_menu(html_soup)
         # recherche horaires
         horaires = recherche_horaires(html_soup)
-        # recherche json
-        recherche = html_soup.findAll("script", attrs={'type': "application/ld+json"})
+        # recuperation des données sur le json
+        donnee_json = recherche_json(html_soup)
+        # Recherche des coordonnees gps
+        gps = recherche_coord_gps(html_soup)
+        print(gps)
+        # ajout au dictionnaire:
+        if donnee_json != "None":
+            donne[donnee_json[0]] = [donnee_json[1:], nom_site, menu, horaires, suggestion, prestation]
 
-        try:
-            recherche = json.loads(recherche[0].getText())[0]
-            donne[recherche['name']] = [recherche["address"]["streetAddress"], recherche["address"]["postalCode"],
-                                        recherche["address"]["addressLocality"], recherche["telephone"], nom_site,
-                                        recherche["servesCuisine"],
-                                        recherche["review"][0]["reviewRating"]["ratingValue"], menu, suggestion,
-                                        prestation,horaires]
-
-        except KeyError:
-            # pas de note
-            donne[recherche['name']] = [recherche["address"]["streetAddress"], recherche["address"]["postalCode"],
-                                        recherche["address"]["addressLocality"], recherche["telephone"], nom_site,
-                                        "None", "None", menu, suggestion, prestation,horaires]
-        except IndexError:
-            # pas de json
-            pass
     return donne

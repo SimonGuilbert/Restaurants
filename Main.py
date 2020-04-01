@@ -32,7 +32,8 @@ url_acceuil = "https://www.pagesjaunes.fr/annuaire/chercherlespros?quoiqui=resta
 donne = {}
 if __name__ == "__main__":
     nbre_page = TPJ.nombre_de_page(url_acceuil)
-    for page in range(1, 5):
+    print("================",nbre_page)
+    for page in range(1, 4):
         url_page = TPJ.visiter_page(url_acceuil, page)
         donne.update(TPJ.recuperation_des_donnees(url_page))
     # Creaction du CSV
