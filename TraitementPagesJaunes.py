@@ -163,8 +163,9 @@ def recherche_horaires(html_soup, ):
     """
     horaires = []
     ul_horaires = html_soup.find("ul", class_="hidden liste-horaires-principaux")  # ul contenant les horaires
-    li_horaires = ul_horaires.findAll("li", class_="horaire-ouvert")
     try:
+        li_horaires = ul_horaires.findAll("li", class_="horaire-ouvert")
+
         for li in li_horaires:
             jour = li.find('p')  # Recherche du jour
             heures = li.findAll("span", class_="horaire")  # Recherche des horaires pour ce jour
@@ -180,12 +181,12 @@ def recherche_horaires(html_soup, ):
 def recherche_coord_gps(html_soup):
     try:
         div = html_soup.find("div", id="bloc-ouverture")
-        print(div)
+
         url = json.loads(div.get("data-pjajax"))["url"]  # Valeur de la clé "url" du dictionnaire data-pjajax
-        print(url)
+
         url = url[(len(url) - 38):]  # On enlève les 10 premiers caractères de gauche
         url = "https://www.pagesjaunes.fr/carte?" + url
-        print(url)
+
         req = Request(url, headers={"User-Agent": "Mozilla/70.0"})
         html = urlopen(req).read()
         html_soup = BeautifulSoup(html, 'html.parser')
@@ -214,7 +215,7 @@ def recherche_json(html_soup):
         return [recherche['name'], recherche["address"]["streetAddress"],
                 recherche["address"]["postalCode"],
                 recherche["address"]["addressLocality"], recherche["telephone"],
-                "None", "None"]
+                recherche["servesCuisine"], "None"]
     except IndexError:
         # pas de json
         return "None"
@@ -234,7 +235,7 @@ def recuperation_des_donnees(url):
         DESCRIPTION: Information retenu pour le CSV
 
     """
-    sleep(2)
+    sleep(4)
     req = Request(url, headers={"User-Agent": "Mozilla/70.0"})
     html = urlopen(req).read()
     html_soup = BeautifulSoup(html, 'html.parser')
@@ -266,9 +267,16 @@ def recuperation_des_donnees(url):
         donnee_json = recherche_json(html_soup)
         # Recherche des coordonnees gps
         gps = recherche_coord_gps(html_soup)
-        print(gps)
-        # ajout au dictionnaire:
-        if donnee_json != "None":
-            donne[donnee_json[0]] = [donnee_json[1:], nom_site, menu, horaires, suggestion, prestation]
 
+        # ajout au dictionnaire :
+
+        if donnee_json != "None":
+            donne[donnee_json[0]] = []
+            donne[donnee_json[0]].extend(nom_site)
+            donne[donnee_json[0]].extend(menu)
+            donne[donnee_json[0]].extend(horaires)
+            donne[donnee_json[0]].extend(suggestion)
+            donne[donnee_json[0]].extend(prestation)
+        else:
+            print("erreur")
     return donne
