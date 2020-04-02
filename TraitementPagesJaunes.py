@@ -88,9 +88,9 @@ def recherche_site_web(html_soup):
     try:
         for div in div_sites:
             site = div.find('span', class_="value")  # Recherche de l'adresse du site web
-            return site.text
+            return [site.text]
     except:
-        return "None"
+        return ["None"]
 
 
 def recherche_menu(html_soup):
@@ -169,9 +169,9 @@ def recherche_horaires(html_soup, ):
         for li in li_horaires:
             jour = li.find('p')  # Recherche du jour
             heures = li.findAll("span", class_="horaire")  # Recherche des horaires pour ce jour
-            un_jour = [jour.text]
+            un_jour = [jour.text.strip("\n")]
             for heure in heures:  # Ajout de toutes les heures
-                un_jour += [heure.text]
+                un_jour += [heure.text.strip("\n")]
             horaires += un_jour
     except:
         horaires += ["None"]
@@ -179,23 +179,26 @@ def recherche_horaires(html_soup, ):
 
 
 def recherche_coord_gps(html_soup):
+    """
+    Crée la liste des coordonnees gps du restaurant
+    :type html_soup: beautifulsoup
+    :param html_soup: html du site dans le format de la bibliotheque beautifulsoup
+    :return: la liste des coordonnees gps du restaurant
+    """
     try:
         div = html_soup.find("div", id="bloc-ouverture")
-
-        url = json.loads(div.get("data-pjajax"))["url"]  # Valeur de la clé "url" du dictionnaire data-pjajax
-
-        url = url[(len(url) - 38):]  # On enlève les 10 premiers caractères de gauche
-        url = "https://www.pagesjaunes.fr/carte?" + url
-
+        url_json = json.loads(div.get("data-pjajax"))["url"]  # Valeur de la clé "url" du dictionnaire data-pjajax
+        url = "https://www.pagesjaunes.fr/carte?" + url_json[len(url_json)-72:]
+        sleep(3)
         req = Request(url, headers={"User-Agent": "Mozilla/70.0"})
         html = urlopen(req).read()
         html_soup = BeautifulSoup(html, 'html.parser')
         button = html_soup.find("button",
-                                class_="button secondaire-1 xs_large calculer")  # Recherche de toutes les balise button
-        coord = button.get("data-pjcarto-itineraire")["xyproqualif"]
+                                class_="button large-button")  # Recherche de toutes les balises button
+        coord = json.loads(button.get("data-pjcarto-itineraire"))["xyproqualif"]
         return coord  # Retourne les coordonnées de la forme [latitude,longitude]
     except:
-        return "None"
+        return ["None"]
 
 
 def recherche_json(html_soup):
@@ -215,10 +218,10 @@ def recherche_json(html_soup):
         return [recherche['name'], recherche["address"]["streetAddress"],
                 recherche["address"]["postalCode"],
                 recherche["address"]["addressLocality"], recherche["telephone"],
-                recherche["servesCuisine"], "None"]
+                "None", "None"]
     except IndexError:
         # pas de json
-        return "None"
+        return ["None"]
 
 
 def recuperation_des_donnees(url):
@@ -271,12 +274,16 @@ def recuperation_des_donnees(url):
         # ajout au dictionnaire :
 
         if donnee_json != "None":
-            donne[donnee_json[0]] = []
+
+            donne[donnee_json[0]] = donnee_json [1:]
             donne[donnee_json[0]].extend(nom_site)
             donne[donnee_json[0]].extend(menu)
-            donne[donnee_json[0]].extend(horaires)
+            donne[donnee_json[0]] += [horaires]
             donne[donnee_json[0]].extend(suggestion)
             donne[donnee_json[0]].extend(prestation)
+            donne[donnee_json[0]] += [gps]
+            print(donnee_json[0])
         else:
             print("erreur")
+
     return donne

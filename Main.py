@@ -17,9 +17,10 @@ import csv
 def to_CSV(donne):
     with open("data/restaurant.csv", 'w') as csvfile:
         spamwriter = csv.writer(csvfile, delimiter=';', quotechar=' ', quoting=csv.QUOTE_MINIMAL)
-        spamwriter.writerow(["Name ", "address ", "Ville ", "Code postal ", "telephone ", "site",
-                             "type de restaurant, cuisine,style cuisinaire", "Note ", "menu ", "suggestion ",
-                             "prestation ", "horaire "])
+        spamwriter.writerow(["Name ", "address ", "Ville ", "Code postal ", "telephone ",
+                             "type de restaurant cuisine,style cuisinaire",
+                             "site", "Note ", "menu ", "suggestion ",
+                             "prestation ", "horaire ", "GPS_X", "GPS_Y"])
         for nom_restaurant in donne.keys():
             spamwriter.writerow([nom_restaurant] + donne[nom_restaurant])
     print("CSV terminé à l'emplacement data/restaurant.csv du repertoire courant")
