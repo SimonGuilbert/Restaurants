@@ -188,7 +188,7 @@ def recherche_coord_gps(html_soup):
     try:
         div = html_soup.find("div", id="bloc-ouverture")
         url_json = json.loads(div.get("data-pjajax"))["url"]  # Valeur de la clé "url" du dictionnaire data-pjajax
-        url = "https://www.pagesjaunes.fr/carte?" + url_json[len(url_json)-72:]
+        url = "https://www.pagesjaunes.fr/carte?" + url_json[len(url_json) - 72:]
         sleep(3)
         req = Request(url, headers={"User-Agent": "Mozilla/70.0"})
         html = urlopen(req).read()
@@ -275,12 +275,12 @@ def recuperation_des_donnees(url):
 
         if donnee_json != "None":
 
-            donne[donnee_json[0]] = donnee_json [1:]
+            donne[donnee_json[0]] = donnee_json[1:]
             donne[donnee_json[0]].extend(nom_site)
-            donne[donnee_json[0]].extend(menu)
+            donne[donnee_json[0]] += [menu]
             donne[donnee_json[0]] += [horaires]
-            donne[donnee_json[0]].extend(suggestion)
-            donne[donnee_json[0]].extend(prestation)
+            donne[donnee_json[0]] += [suggestion]
+            donne[donnee_json[0]] += [prestation]
             donne[donnee_json[0]] += [gps]
             print(donnee_json[0])
         else:
