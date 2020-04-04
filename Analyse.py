@@ -7,35 +7,29 @@ class Analyse:
         self.df = pd.DataFrame(pd.read_csv("data/" + file + ".csv", sep=";"))
 
     def Creaction_graphique(self):
-        print("Creaction Des graphiques en cours")
-        self.Plot_Horraire()
+        print("Création Des graphiques en cours")
         self.Plot_Note()
+        self.Plot_Horraire()
         print("Graphique Terminé, vous trouverez les fichiers :\n"
               " ♦ Note.png\n"
               " ♦ Horaire.png\n"
-              "dans data\graphique du repertoire courant.")
+              "dans data\Graphiques du repertoire courant.")
 
     def Plot_Note(self):
         """
-        Trace le graphique des note en fonction du nombre de fois quelle apparaisse
-
-        :return: Graphique en PNG
+        Trace le graphique du nombre d'occurences en fonction de la note attribuée
+        :return: Sauvegarde le graphique en data/Graphiques/Notes.png
         """
-        Note = {'note': [], 'compteur': []}
+        Note = {"NoteSur5":["1/5","2/5","3/5","4/5","5/5"], "Effectif":[0,0,0,0,0]}
         for i in self.df[self.df["Note"].notna()]["Note"]:
-            if not i in Note["note"]:
-                Note["note"].append(i)
-                Note["compteur"].append(1)
-            else:
-                Note["compteur"][Note["note"].index(i)] += 1
-        df_plot = pd.DataFrame(Note, columns=["note", "compteur"])
-        df_plot.sort_values(by=["compteur"])
-        df_plot.plot.bar(x="compteur", y="note")
-        plt.title("Note en fonction du nombre d'occurence")
-        plt.xlabel("Nombre d'occurence")
+            Note["Effectif"][int(i)-1] += 1
+        df_plot = pd.DataFrame(Note)
+        df_plot.plot.barh(x="NoteSur5", y="Effectif")
+        plt.title("Nombre d'occurences en fonction de la note attribuée")
+        plt.xlabel("Nombre d'occurences")
         plt.ylabel("Note entre 0 et 5 ")
-        plt.grid(True)
-        plt.savefig("data/Graphique/Note.png")
+        #plt.grid(False)
+        plt.savefig("data/Graphiques/Notes.png")
 
     def Plot_Horraire(self):
         dico_horaire = {"horaire": [], "occurence": []}
@@ -64,4 +58,4 @@ class Analyse:
         plt.xlabel("Nombre d'occurence")
         plt.ylabel("horaire ")
         plt.grid(True)
-        plt.savefig("data/Graphique/Horaire.png")
+        plt.savefig("data/Graphiques/Horaire.png")
