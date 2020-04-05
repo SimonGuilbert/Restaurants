@@ -27,10 +27,9 @@ if __name__ == "__main__":
         print("Traitement de la page : " + str(page) + "/" + str(nbre_page))
         url_page = TPJ.visiter_page(url_accueil, page)
         data = TPJ.recuperation_des_donnees(url_page, data)
-    # Création du DataFrame
-    df = pandas.DataFrame(data)
-    # Creation du CSV
-    df.to_csv('data/Restaurants.csv', sep=';')
+    df = pandas.DataFrame(data) # Création du DataFrame
+    df.drop_duplicates() # Supression des doublons
+    df.to_csv('data/Restaurants.csv', sep=';') # Creation du CSV
     # Creation de la carte HTML
     carte = Carte()
     for resto in df[(df["Longitude"].notna()) & (df["Latitude"].notna())].itertuples():
