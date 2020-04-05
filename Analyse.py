@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 class Analyse:
     def __init__(self, file):
         self.df = pd.DataFrame(pd.read_csv("data/" + file + ".csv", sep=";"))
+
     def Creaction_graphique(self):
         print("Creaction Des graphiques en cours")
         self.Plot_Horraire()
@@ -21,9 +22,9 @@ class Analyse:
         Trace le graphique du nombre d'occurences en fonction de la note attribuée
         :return: Sauvegarde le graphique en data/Graphiques/Notes.png
         """
-        Note = {"NoteSur5":["1/5","2/5","3/5","4/5","5/5"], "Effectif":[0,0,0,0,0]}
+        Note = {"NoteSur5": ["1/5", "2/5", "3/5", "4/5", "5/5"], "Effectif": [0, 0, 0, 0, 0]}
         for i in self.df[self.df["Note"].notna()]["Note"]:
-            Note["Effectif"][int(i)-1] += 1
+            Note["Effectif"][int(i) - 1] += 1
         df_plot = pd.DataFrame(Note)
         df_plot.plot.barh(x="NoteSur5", y="Effectif")
         plt.title("Nombre d'occurences en fonction de la note attribuée")
@@ -61,15 +62,22 @@ class Analyse:
         plt.savefig("data/Graphique/Horaire.png")
 
     def Plot_camembert_style_culinaire(self):
-        cuisine = {'Style': ["Restaurant Français"], 'compteur': [0]}
+        cuisine = {'Style': ["Restaurant Français", "divers"], 'compteur': [0, 11]}
         for i in self.df[self.df["Style_Culinaire"].notna()]["Style_Culinaire"]:
             if "français" in i:
-                cuisine["compteur"][0]+=1
+                cuisine["compteur"][0] += 1
             elif not i in cuisine["Style"]:
                 cuisine["Style"].append(i)
                 cuisine["compteur"].append(1)
             else:
                 cuisine["compteur"][cuisine["Style"].index(i)] += 1
+        print(cuisine)
+        for valeur_compteur in cuisine["compteur"][2:]:
+            if valeur_compteur <= 10:
+                cuisine["Style"].pop(cuisine["compteur"].index(valeur_compteur))
+                cuisine['compteur'].remove(valeur_compteur)
+                cuisine['compteur'][1] += 1
+        print(cuisine)
         df_plot = pd.DataFrame(cuisine, columns=["Style", "compteur"], index=cuisine["Style"])
         df_plot.plot.pie(y="compteur")
         plt.title("diagramme en camembert sur les types de restaurant")
