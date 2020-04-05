@@ -7,7 +7,10 @@ class Analyse:
         self.df = pd.DataFrame(pd.read_csv("data/" + file + ".csv", sep=";"))
 
     def Creaction_graphique(self):
-        print("Creaction Des graphiques en cours")
+        """
+        :return: Permet de tracer tout les graphiques possibles
+        """
+        print("Creaction des graphiques en cours")
         self.Plot_Horraire()
         self.Plot_Note()
         self.Plot_camembert_style_culinaire()
@@ -33,8 +36,10 @@ class Analyse:
         plt.savefig("data/Graphique/Notes.png")
 
     def Plot_Horraire(self):
+        """
+        :return: Sauvegarde le graphique en data/Graphiques/.png
+        """
         dico_horaire = {"horaire": [], "occurence": []}
-
         for horaire_string in self.df[self.df["Note"].notna()]["Horaires"]:
             liste_horaires = []
             try:
@@ -62,6 +67,10 @@ class Analyse:
         plt.savefig("data/Graphique/Horaire.png")
 
     def Plot_camembert_style_culinaire(self):
+        """
+        Trace le diagramme circulaire des  styles culinaires des restaurants les plus fréquents
+        :return: Sauvegarde le graphique en data/Graphique/Style_Culinaire.png
+        """
         cuisine = {'Style': ["Restaurant Français", "divers"], 'compteur': [0, 11]}
         for i in self.df[self.df["Style_Culinaire"].notna()]["Style_Culinaire"]:
             if "français" in i:
@@ -71,14 +80,13 @@ class Analyse:
                 cuisine["compteur"].append(1)
             else:
                 cuisine["compteur"][cuisine["Style"].index(i)] += 1
-        print(cuisine)
+        # gestion de la categorie divers
         for valeur_compteur in cuisine["compteur"][2:]:
             if valeur_compteur <= 10:
                 cuisine["Style"].pop(cuisine["compteur"].index(valeur_compteur))
                 cuisine['compteur'].remove(valeur_compteur)
                 cuisine['compteur'][1] += 1
-        print(cuisine)
         df_plot = pd.DataFrame(cuisine, columns=["Style", "compteur"], index=cuisine["Style"])
         df_plot.plot.pie(y="compteur")
-        plt.title("diagramme en camembert sur les types de restaurant")
+        plt.title("Diagramme circulaire sur les types de restaurant")
         plt.savefig("data/Graphique/Style_Culinaire.png")
