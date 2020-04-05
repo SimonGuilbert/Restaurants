@@ -5,15 +5,16 @@ import matplotlib.pyplot as plt
 class Analyse:
     def __init__(self, file):
         self.df = pd.DataFrame(pd.read_csv("data/" + file + ".csv", sep=";"))
-
     def Creaction_graphique(self):
-        print("Création Des graphiques en cours")
-        self.Plot_Note()
+        print("Creaction Des graphiques en cours")
         self.Plot_Horraire()
+        self.Plot_Note()
+        self.Plot_camembert_style_culinaire()
         print("Graphique Terminé, vous trouverez les fichiers :\n"
               " ♦ Note.png\n"
               " ♦ Horaire.png\n"
-              "dans data\Graphiques du repertoire courant.")
+              " ♦ Style_culinaire.png\n"
+              "dans data\graphique du repertoire courant.")
 
     def Plot_Note(self):
         """
@@ -28,8 +29,7 @@ class Analyse:
         plt.title("Nombre d'occurences en fonction de la note attribuée")
         plt.xlabel("Nombre d'occurences")
         plt.ylabel("Note entre 0 et 5 ")
-        #plt.grid(False)
-        plt.savefig("data/Graphiques/Notes.png")
+        plt.savefig("data/Graphique/Notes.png")
 
     def Plot_Horraire(self):
         dico_horaire = {"horaire": [], "occurence": []}
@@ -58,4 +58,19 @@ class Analyse:
         plt.xlabel("Nombre d'occurence")
         plt.ylabel("horaire ")
         plt.grid(True)
-        plt.savefig("data/Graphiques/Horaire.png")
+        plt.savefig("data/Graphique/Horaire.png")
+
+    def Plot_camembert_style_culinaire(self):
+        cuisine = {'Style': ["Restaurant Français"], 'compteur': [0]}
+        for i in self.df[self.df["Style_Culinaire"].notna()]["Style_Culinaire"]:
+            if "français" in i:
+                cuisine["compteur"][0]+=1
+            elif not i in cuisine["Style"]:
+                cuisine["Style"].append(i)
+                cuisine["compteur"].append(1)
+            else:
+                cuisine["compteur"][cuisine["Style"].index(i)] += 1
+        df_plot = pd.DataFrame(cuisine, columns=["Style", "compteur"], index=cuisine["Style"])
+        df_plot.plot.pie(y="compteur")
+        plt.title("diagramme en camembert sur les types de restaurant")
+        plt.savefig("data/Graphique/Style_Culinaire.png")
