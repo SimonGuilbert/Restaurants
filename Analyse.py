@@ -71,9 +71,11 @@ class Analyse:
         Trace le diagramme circulaire des styles culinaires des restaurants les plus fréquents
         :return: Sauvegarde le graphique en data/Graphique/Style_Culinaire.png
         """
-        cuisine = {'Style': ["Restaurant Français", "Restaurant savoyard", "Pizzeria","Restaurant Asiatique", "Fast-food","Autres régions du monde","Autres"], 'Effectif': [0,0,0,0,0,0,0]}
+        cuisine = {
+            'Style': ["Restaurant Français", "Restaurant savoyard", "Pizzeria", "Restaurant Asiatique", "Fast-food",
+                      "Autres régions du monde", "Autres"], 'Effectif': [0, 0, 0, 0, 0, 0, 0]}
         for style in self.df[self.df["Style_Culinaire"].notna()]["Style_Culinaire"]:
-            
+
             if "français" in style:
                 cuisine["Effectif"][0] += 1
             elif "savoyard" in style or "tartiflette" in style or "traditionnel" in style:
@@ -89,7 +91,7 @@ class Analyse:
             else:
                 cuisine["Effectif"][6] += 1
         df_plot = pd.DataFrame(cuisine, columns=["Style", "Effectif"])
-        df_plot.plot(kind='pie', y = 'Effectif', autopct='%1.0f%%', startangle=55,
-                labels=df_plot['Style'], legend = False, fontsize=14,figsize=(16,8))
-        plt.title("Diagramme circulaire sur les types de restaurant",fontsize=16)
+        df_plot.plot(kind='pie', y='Effectif', autopct='%1.0f%%', startangle=55,
+                     labels=df_plot['Style'], legend=False, fontsize=14, figsize=(16, 8))
+        plt.title("Diagramme circulaire sur les types de restaurant", fontsize=16)
         plt.savefig("data/Graphique/Style_Culinaire.png")

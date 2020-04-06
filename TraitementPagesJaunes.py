@@ -10,6 +10,7 @@ Created on Thu Mar 12 10:06:47 2020
 from urllib.request import Request
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
+
 import json
 from time import sleep
 import numpy as np
@@ -224,29 +225,30 @@ def recuperation_des_donnees(url, dico):
         # Recuperation des données sur le json
         donnees_json = recherche_json(html_soup)
         # Ajout d'une valeur pour chaque colonne
-
-        dico["Nom"].append(donnees_json[0] if donnees_json is not None else np.nan)
-        dico["Adresse"].append(donnees_json[1] if donnees_json is not None else np.nan)
-        dico["Code_Postal"].append(donnees_json[2] if donnees_json is not None else np.nan)
-        dico["Ville"].append(donnees_json[3] if donnees_json is not None else np.nan)
-        dico["Telephone"].append(donnees_json[4] if donnees_json is not None else np.nan)
-        dico["Site_Internet"].append(recherche_site_web(html_soup))
-        menu = recherche_menu(html_soup)  # Récupération du menu
-        dico["Menu"].append([m[0] for m in menu] if menu is not None else np.nan)
-        dico["Prix_Menu"].append([m[1] for m in menu] if menu is not None else np.nan)
-        dico["Style_Culinaire"].append(
-            np.nan if donnees_json is None else (donnees_json[5] if len(donnees_json) > 5 else np.nan))
-        dico["Note"].append(np.nan if donnees_json is None else (donnees_json[6] if len(donnees_json) > 5 else np.nan))
-        suggestions = recherche_suggestion(html_soup)  # Récupération des suggestions
-        dico["Suggestion"].append([s[0] for s in suggestions] if suggestions is not None else np.nan)
-        dico["Prix_Suggestion"].append([s[1] for s in suggestions] if suggestions is not None else np.nan)
-        dico["Prestation"].append(recherche_prestation(html_soup))
-        dico["Horaires"].append(recherche_horaires(html_soup))
-        gps = recherche_coord_gps(html_soup)  # Récupération des coordonnées GPS
-        try:
-            dico["Longitude"].append(gps[0])
-            dico["Latitude"].append(gps[1])
-        except:
-            dico["Longitude"].append(np.nan)
-            dico["Latitude"].append(np.nan)
+        if donnees_json is not None:
+            dico["Nom"].append(donnees_json[0] if donnees_json is not None else np.nan)
+            dico["Adresse"].append(donnees_json[1] if donnees_json is not None else np.nan)
+            dico["Code_Postal"].append(donnees_json[2] if donnees_json is not None else np.nan)
+            dico["Ville"].append(donnees_json[3] if donnees_json is not None else np.nan)
+            dico["Telephone"].append(donnees_json[4] if donnees_json is not None else np.nan)
+            dico["Site_Internet"].append(recherche_site_web(html_soup))
+            menu = recherche_menu(html_soup)  # Récupération du menu
+            dico["Menu"].append([m[0] for m in menu] if menu is not None else np.nan)
+            dico["Prix_Menu"].append([m[1] for m in menu] if menu is not None else np.nan)
+            dico["Style_Culinaire"].append(
+                np.nan if donnees_json is None else (donnees_json[5] if len(donnees_json) > 5 else np.nan))
+            dico["Note"].append(
+                np.nan if donnees_json is None else (donnees_json[6] if len(donnees_json) > 5 else np.nan))
+            suggestions = recherche_suggestion(html_soup)  # Récupération des suggestions
+            dico["Suggestion"].append([s[0] for s in suggestions] if suggestions is not None else np.nan)
+            dico["Prix_Suggestion"].append([s[1] for s in suggestions] if suggestions is not None else np.nan)
+            dico["Prestation"].append(recherche_prestation(html_soup))
+            dico["Horaires"].append(recherche_horaires(html_soup))
+            gps = recherche_coord_gps(html_soup)  # Récupération des coordonnées GPS
+            try:
+                dico["Longitude"].append(gps[0])
+                dico["Latitude"].append(gps[1])
+            except:
+                dico["Longitude"].append(np.nan)
+                dico["Latitude"].append(np.nan)
     return dico
