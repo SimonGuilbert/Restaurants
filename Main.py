@@ -7,7 +7,7 @@ Created on Mon Mar 16 09:37:08 2020
 # =============================================================================
 # Import
 # =============================================================================
-import TraitementPagesJaunesPANDA as TPJ
+import TraitementPagesJaunes as TPJ
 from Folium import Carte
 import pandas
 
