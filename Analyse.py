@@ -32,7 +32,7 @@ class Analyse:
         df_plot.plot.barh(x="NoteSur5", y="Effectif")
         plt.title("Nombre d'occurences en fonction de la note attribuée")
         plt.xlabel("Nombre d'occurences")
-        plt.ylabel("Note entre 0 et 5 ")
+        plt.ylabel("Note entre 1 et 5 ")
         plt.savefig("data/Graphique/Notes.png")
 
     def Plot_Horraire(self):
@@ -68,25 +68,28 @@ class Analyse:
 
     def Plot_camembert_style_culinaire(self):
         """
-        Trace le diagramme circulaire des  styles culinaires des restaurants les plus fréquents
+        Trace le diagramme circulaire des styles culinaires des restaurants les plus fréquents
         :return: Sauvegarde le graphique en data/Graphique/Style_Culinaire.png
         """
-        cuisine = {'Style': ["Restaurant Français", "divers"], 'compteur': [0, 11]}
-        for i in self.df[self.df["Style_Culinaire"].notna()]["Style_Culinaire"]:
-            if "français" in i:
-                cuisine["compteur"][0] += 1
-            elif not i in cuisine["Style"]:
-                cuisine["Style"].append(i)
-                cuisine["compteur"].append(1)
+        cuisine = {'Style': ["Restaurant Français", "Restaurant savoyard", "Pizzeria","Restaurant Asiatique", "Fast-food","Autres régions du monde","Autres"], 'Effectif': [0,0,0,0,0,0,0]}
+        for style in self.df[self.df["Style_Culinaire"].notna()]["Style_Culinaire"]:
+            
+            if "français" in style:
+                cuisine["Effectif"][0] += 1
+            elif "savoyard" in style or "tartiflette" in style or "traditionnel" in style:
+                cuisine["Effectif"][1] += 1
+            elif "pizzeria" in style or "italien" in style:
+                cuisine["Effectif"][2] += 1
+            elif "asiatique" in style or "chinois" in style or "indien" in style or "japonais" in style or "thaï" in style or "vietnam" in style:
+                cuisine["Effectif"][3] += 1
+            elif "fast food" in style or "kebab" in style or "américain" in style or "mexicain" in style or "turc" in style or "rapide" in style or "sandwich" in style or "grec" in style:
+                cuisine["Effectif"][4] += 1
+            elif "monde" in style.lower():
+                cuisine["Effectif"][5] += 1
             else:
-                cuisine["compteur"][cuisine["Style"].index(i)] += 1
-        # gestion de la categorie divers
-        for valeur_compteur in cuisine["compteur"][2:]:
-            if valeur_compteur <= 10:
-                cuisine["Style"].pop(cuisine["compteur"].index(valeur_compteur))
-                cuisine['compteur'].remove(valeur_compteur)
-                cuisine['compteur'][1] += 1
-        df_plot = pd.DataFrame(cuisine, columns=["Style", "compteur"], index=cuisine["Style"])
-        df_plot.plot.pie(y="compteur")
-        plt.title("Diagramme circulaire sur les types de restaurant")
+                cuisine["Effectif"][6] += 1
+        df_plot = pd.DataFrame(cuisine, columns=["Style", "Effectif"])
+        df_plot.plot(kind='pie', y = 'Effectif', autopct='%1.0f%%', startangle=55,
+                labels=df_plot['Style'], legend = False, fontsize=14,figsize=(16,8))
+        plt.title("Diagramme circulaire sur les types de restaurant",fontsize=16)
         plt.savefig("data/Graphique/Style_Culinaire.png")
