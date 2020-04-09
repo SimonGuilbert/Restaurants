@@ -10,7 +10,6 @@ Created on Thu Mar 12 10:06:47 2020
 from urllib.request import Request
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
-
 import json
 from time import sleep
 import numpy as np
@@ -64,44 +63,23 @@ def recherche_site_web(html_soup):
         return np.nan
 
 
-def recherche_menu(html_soup):
-    """
-    Crée la liste des repas proposés par le restaurant avec leur prix 
-    Si le menu n'est pas renseigné alors on retourne une valeur manquante
-    :param html_soup: html du site dans le format de la bibliotheque BeautifulSoup
-    """
-    formules = []
-    try:
-        div_formules = html_soup.findAll("div", class_="formule marg-btm-s row")  # div contenant les formules
-        for div in div_formules:
-            formule = div.find('p', class_="no-margin")  # Recherche de l'intitule de la formule
-            prix = div.find('span', class_="tarif-formule")  # Recherche du prix de la formule
-            formules.append([formule.text, prix.text])
-    except:
-        return None
-    if not formules:
-        return None
-    return formules
-
-
 def recherche_suggestion(html_soup):
     """
     Crée la liste des suggestion du restaurant avec leur prix 
     Si les suggestions ne sont pas renseignées alors on retourne None
     :param html_soup: html du site dans le format de la bibliotheque beautifulsoup
     """
-    suggestions = []
+    suggestions = ""
     try:
         div_suggestions = html_soup.findAll("div", class_="marg-btm-xs row")  # div contenant les formules
         for div in div_suggestions:
             suggestion = div.find('span', class_="col-xs-10 description-mets")  # Recherche de l'intitule de la formule
-            prix = div.find('span', class_="col-xs-2 tarif-mets")  # Recherche du prix de la formule
-            suggestions.append([suggestion.text, prix.text])
+            suggestions += suggestion.text+" / "
     except:
-        return None
-    if not suggestions:
-        return None
-    return suggestions
+        return np.nan
+    if suggestions == "":
+        return np.nan
+    return suggestions[:len(suggestions)-3]
 
 
 def recherche_prestation(html_soup):
@@ -110,17 +88,17 @@ def recherche_prestation(html_soup):
     Si les prestation ne sont pas renseignées alors on retourne une valeur manquante
     :param html_soup: html du site dans le format de la bibliotheque beautifulsoup
     """
-    prestations = []
+    prestations = ""
     li_prestations = html_soup.findAll("li", class_="col-sm-6 marg-btm-s")  # li contenant les prestations
     try:
         for li in li_prestations:
             prestation = li.find('span')  # Recherche de l'intitule de la prestation
-            prestations += [prestation.text]
+            prestations += prestation.text+" / "
     except:
         return np.nan
-    if not prestations:
+    if prestations == "":
         return np.nan
-    return prestations
+    return prestations[:len(prestations)-3]
 
 
 def recherche_horaires(html_soup, ):
@@ -194,9 +172,9 @@ def recherche_json(html_soup):
 
 
 def dicoVierge():
-    res = {"Nom": [], "Adresse": [], "Code_Postal": [], "Ville": [], "Telephone": [], "Site_Internet": [], "Menu": [],
-           "Prix_Menu": [], "Style_Culinaire": [], "Note": [], "Suggestion": [], "Prix_Suggestion": [],
-           "Prestation": [], "Horaires": [], "Longitude": [], "Latitude": []}
+    res = {"Nom": [], "Adresse": [], "Code_Postal": [], "Ville": [], "Telephone": [], "Site_Internet": [],
+           "Style_Culinaire": [], "Note": [], "Suggestion": [], "Prestation": [],
+           "Horaires": [], "Longitude": [], "Latitude": []}
     return res
 
 
@@ -226,22 +204,15 @@ def recuperation_des_donnees(url, dico):
         donnees_json = recherche_json(html_soup)
         # Ajout d'une valeur pour chaque colonne
         if donnees_json is not None:
-            dico["Nom"].append(donnees_json[0] if donnees_json is not None else np.nan)
-            dico["Adresse"].append(donnees_json[1] if donnees_json is not None else np.nan)
-            dico["Code_Postal"].append(donnees_json[2] if donnees_json is not None else np.nan)
-            dico["Ville"].append(donnees_json[3] if donnees_json is not None else np.nan)
-            dico["Telephone"].append(donnees_json[4] if donnees_json is not None else np.nan)
+            dico["Nom"].append(donnees_json[0])
+            dico["Adresse"].append(donnees_json[1])
+            dico["Code_Postal"].append(donnees_json[2])
+            dico["Ville"].append(donnees_json[3])
+            dico["Telephone"].append(donnees_json[4])
             dico["Site_Internet"].append(recherche_site_web(html_soup))
-            menu = recherche_menu(html_soup)  # Récupération du menu
-            dico["Menu"].append([m[0] for m in menu] if menu is not None else np.nan)
-            dico["Prix_Menu"].append([m[1] for m in menu] if menu is not None else np.nan)
-            dico["Style_Culinaire"].append(
-                np.nan if donnees_json is None else (donnees_json[5] if len(donnees_json) > 5 else np.nan))
-            dico["Note"].append(
-                np.nan if donnees_json is None else (donnees_json[6] if len(donnees_json) > 5 else np.nan))
-            suggestions = recherche_suggestion(html_soup)  # Récupération des suggestions
-            dico["Suggestion"].append([s[0] for s in suggestions] if suggestions is not None else np.nan)
-            dico["Prix_Suggestion"].append([s[1] for s in suggestions] if suggestions is not None else np.nan)
+            dico["Style_Culinaire"].append(donnees_json[5] if len(donnees_json) > 5 else np.nan)
+            dico["Note"].append(donnees_json[6] if len(donnees_json) > 5 else np.nan)
+            dico["Suggestion"].append(recherche_suggestion(html_soup))
             dico["Prestation"].append(recherche_prestation(html_soup))
             dico["Horaires"].append(recherche_horaires(html_soup))
             gps = recherche_coord_gps(html_soup)  # Récupération des coordonnées GPS
