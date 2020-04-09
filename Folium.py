@@ -29,8 +29,8 @@ class Carte:
         None.
         """
         if coord is None:
-            coord = [48.8534, 2.3488]
-        self.carte = fl.Map(location=coord)
+            coord = [45.89912, 6.12871]
+        self.carte = fl.Map(location=coord,zoom_start=6)
 
     def cercle(self, coord, rayon, color='crimson'):
         """
@@ -74,7 +74,7 @@ class Carte:
         lien pour modifier l'apparence des icones : getbootstrap.com/docs/3.3/components/
         """
         fl.Marker(coordonnee, popup='<i>' + str(popupstr) + '</i>', tooltip=tooltip,
-                  icon=fl.Icon(color='black', icon_color='yellow', icon='glyphicon-user')).add_to(self.carte)
+                  icon=fl.Icon(color='black', icon_color='orange', icon='glyphicon-cutlery')).add_to(self.carte)
 
     def save(self, fil='index.html'):
         """
