@@ -28,13 +28,13 @@ if __name__ == "__main__":
         url_page = TPJ.visiter_page(url_accueil, page)
         data = TPJ.recuperation_des_donnees(url_page, data)
     df = pandas.DataFrame(data) # Création du DataFrame
-    df.drop_duplicates(subset="Nom", keep="last")
+    df.drop_duplicates(subset=["Nom","Code_Postal","Telephone"], keep="first")
     df.to_csv('data/Restaurants.csv', sep=';') # Creation du CSV
     # Creation de la carte HTML
     carte = Carte()
     for resto in df[(df["Longitude"].notna()) & (df["Latitude"].notna())].itertuples():
         carte.marqueur([resto.Longitude, resto.Latitude], resto.Nom, "Cliquez pour afficher le restaurant")
-    carte.save("Restaurants")
+    carte.save("Restaurants.html")
     print("\nTraitement terminé. Vous trouverez les fichiers\n  "
           "♦ Restaurants.csv\n  ♦ Restaurants.html\n"
           "Dans le répertoire courant")
