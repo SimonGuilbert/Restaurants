@@ -51,7 +51,7 @@ if __name__ == "__main__":
         except:
             print("ATTENTION : impossible de lire la page "+url_page)
     df = pandas.DataFrame(data) # Création du DataFrame
-    df.drop_duplicates(subset=["Nom","Code_Postal","Telephone"], keep="first")
+    df = df.drop_duplicates(subset=["Nom","Code_Postal","Telephone"], keep="first")
     fichier = "Restaurants"+"-"+nom_dep+"-"+choix+".csv"
     df.to_csv("Resultats/"+fichier, sep=";") # Creation du CSV
     print("\nTraitement terminé. Vous trouverez le fichier",fichier,"dans le dossier Resultats du répertoire courant")
