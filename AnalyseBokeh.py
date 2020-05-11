@@ -19,9 +19,9 @@ class AnalyseBokeh:
         self.fichier1 = fichier1
         self.fichier2 = fichier2
         self.nom_departement1 = self.fichier1[22:len(fichier1)-4]
-        self.df1 = pd.DataFrame(pd.read_csv(fichier1, sep=";"))
+        self.df1 = pd.DataFrame(pd.read_csv(fichier1, sep=","))
         if self.fichier2 != "":
-            self.df2 = pd.DataFrame(pd.read_csv(fichier2, sep=";"))
+            self.df2 = pd.DataFrame(pd.read_csv(fichier2, sep=","))
             self.nom_departement2 = self.fichier2[22:len(fichier2)-4]
         else:
             self.df2 = None
@@ -202,7 +202,7 @@ if __name__ == "__main__":
         f2 = input("Entrez le nom du deuxième fichier : ")
         while not os.path.isfile("Resultats/"+f2):
             print("\nLe fichier est introuvable. Veuillez réessayer : ")
-            f2 = input("Entrez le nom du fichier de la forme 'Restaurants-HAUTE-SAVOIE-74.csv : ")
+            f2 = input("Entrez le nom du deuxième fichier : ")
         print("\nCréation des graphiques en cours ...")
         AnalyseBokeh("Resultats/"+f1,"Resultats/"+f2)
     print("\nTraitement terminé avec succès. Vous trouverez les fichiers :")
