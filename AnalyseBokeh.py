@@ -172,6 +172,7 @@ class AnalyseBokeh:
             res = layout(self.sauvegardeGraphs(self.fichier1,"SteelBlue"),self.sauvegardeGraphs(self.fichier2,"orangered"), 
                          sizing_mode='stretch_both')
         save(res)
+        curdoc().theme = 'dark_minimal'
         
         
     def carteHtml(self):        
